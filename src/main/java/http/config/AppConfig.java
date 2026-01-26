@@ -36,7 +36,7 @@ public class AppConfig {
         this.responseWriter = new HttpResponseWriter();
         this.errorHandler = new ErrorResponseHandler(serverConfig, responseWriter);
         this.staticFileHandler = new StaticFileHandler(serverConfig, responseWriter, errorHandler);
-        this.servletHandler = new ServletHandler(responseWriter);
+        this.servletHandler = new ServletHandler(responseWriter, errorHandler);
         this.router = new Router(staticFileHandler, servletHandler);
     }
 
