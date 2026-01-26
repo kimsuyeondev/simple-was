@@ -27,7 +27,9 @@ public class RequestProcessor implements Runnable {
 
     @Override
     public void run() {
-        try (OutputStream outputStream = new BufferedOutputStream(connection.getOutputStream())) {
+        OutputStream outputStream = null;
+        try {
+            outputStream = new BufferedOutputStream(connection.getOutputStream());
             HttpRequest request = HttpRequestParser.parse(connection.getInputStream());
             logger.info("Request : {} {}", request.getHttpMethod(), request.getRequestURI());
 
@@ -41,17 +43,15 @@ public class RequestProcessor implements Runnable {
 
         } catch (Exception ex) {
             logger.warn("Error talking to {}", connection.getRemoteSocketAddress(), ex);
-            handleServerError();
+            if (outputStream != null) {
+                try {
+                    errorResponseHandler.handle(outputStream, HttpStatus.INTERNAL_SERVER_ERROR);
+                } catch (Exception e) {
+                    logger.warn("Failed to send 500 error", e);
+                }
+            }
         } finally {
             closeConection();
-        }
-    }
-
-    private void handleServerError() {
-        try (OutputStream outputStream = new BufferedOutputStream(connection.getOutputStream())) {
-            errorResponseHandler.handle(outputStream, HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (IOException e) {
-            logger.warn("Failed to send 500 error", e);
         }
     }
 
