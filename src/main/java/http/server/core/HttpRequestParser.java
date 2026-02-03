@@ -11,7 +11,6 @@ import java.io.InputStreamReader;
 public class HttpRequestParser {
 
     private static final String DEFAULT_HOST = "localhost";
-    private static final String DEFAULT_HTTP_VERSION = "HTTP/1.0";
     private final static Logger logger = LoggerFactory.getLogger(HttpRequestParser.class);
 
     public static HttpRequest parse(InputStream inputStream) throws IOException {
@@ -27,7 +26,6 @@ public class HttpRequestParser {
         String[] tokens = requestLine.split("\\s+");
         String method = tokens[0];
         String requestURI = tokens[1];
-        String httpVersion = tokens.length > 2 ? tokens[2] : DEFAULT_HTTP_VERSION;
 
         String host = parseHost(in);
         return new HttpRequest(method, requestURI, host);
